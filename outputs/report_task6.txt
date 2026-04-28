@@ -1,0 +1,14 @@
+=== تقرير المهمة 6 ===
+
+Shape after cleaning: (768, 9)
+
+Expert metrics:
+accuracy     0.649351
+precision    0.500000
+recall       0.722222
+
+ML metrics:
+                    accuracy  precision    recall
+LogisticRegression  0.707792   0.600000  0.500000
+DecisionTree        0.766234   0.645161  0.740741
+KNN                 0.753247   0.681818  0.555556

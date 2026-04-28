@@ -1,0 +1,73 @@
+=== تقرير المهمة 5 ===
+
+Raw shape: (768, 9)
+Clean shape: (768, 9)
+
+أول 5 سجلات:
+ Pregnancies  Glucose  BloodPressure  SkinThickness  Insulin  BMI  DiabetesPedigreeFunction  Age  Outcome
+           6      148             72             35        0 33.6                     0.627   50        1
+           1       85             66             29        0 26.6                     0.351   31        0
+           8      183             64              0        0 23.3                     0.672   32        1
+           1       89             66             23       94 28.1                     0.167   21        0
+           0      137             40             35      168 43.1                     2.288   33        1
+
+أنواع الأعمدة:
+Pregnancies                   int64
+Glucose                       int64
+BloodPressure                 int64
+SkinThickness                 int64
+Insulin                       int64
+BMI                         float64
+DiabetesPedigreeFunction    float64
+Age                           int64
+Outcome                       int64
+
+القيم المفقودة قبل التنظيف:
+Pregnancies                 0
+Glucose                     0
+BloodPressure               0
+SkinThickness               0
+Insulin                     0
+BMI                         0
+DiabetesPedigreeFunction    0
+Age                         0
+Outcome                     0
+
+الإحصاءات الأساسية:
+       Pregnancies     Glucose  BloodPressure  SkinThickness     Insulin         BMI  DiabetesPedigreeFunction         Age     Outcome
+count   768.000000  768.000000     768.000000     768.000000  768.000000  768.000000                768.000000  768.000000  768.000000
+mean      3.837240  121.656250      72.358073      28.866536  124.691081   32.393359                  0.458914   33.199870    0.348958
+std       3.344157   30.438286      11.697097       7.442353    7.913595    6.667471                  0.285596   11.628404    0.476951
+min       0.000000   44.000000      40.000000      14.500000  112.875000   18.200000                  0.078000   21.000000    0.000000
+25%       1.000000   99.750000      64.000000      25.000000  121.500000   27.500000                  0.243750   24.000000    0.000000
+50%       3.000000  117.000000      72.000000      29.000000  125.000000   32.300000                  0.372500   29.000000    0.000000
+75%       6.000000  140.250000      80.000000      32.000000  127.250000   36.600000                  0.626250   41.000000    1.000000
+max      13.500000  199.000000     104.000000      42.500000  135.875000   50.250000                  1.200000   66.500000    1.000000
+
+متوسط/انحراف العمر حسب الإصابة:
+              mean        std  count
+Outcome                             
+0        31.135000  11.477227    500
+1        37.052239  10.925826    268
+
+ارتباط BloodPressure مع BMI: 0.2865
+ارتباط Glucose مع Insulin: 0.4140
+
+أعلى 10 معاملات ارتباط:
+    Feature_1 Feature_2  Correlation  Abs_Correlation
+SkinThickness       BMI     0.559843         0.559843
+  Pregnancies       Age     0.549695         0.549695
+      Glucose   Outcome     0.492782         0.492782
+      Glucose   Insulin     0.413981         0.413981
+BloodPressure       Age     0.332898         0.332898
+          BMI   Outcome     0.312811         0.312811
+BloodPressure       BMI     0.286543         0.286543
+      Glucose       Age     0.268912         0.268912
+      Insulin   Outcome     0.266382         0.266382
+          Age   Outcome     0.242702         0.242702
+
+إجابات الأسئلة:
+- avg_insulin_pregnant_over_35: 126.27
+- min_bmi_male_diabetic: غير متاح (لا يوجد Gender)
+- bp_range_female_non_diabetic: غير متاح (لا يوجد Gender)
+- bp_range_male_over_40: غير متاح (لا يوجد Gender)
