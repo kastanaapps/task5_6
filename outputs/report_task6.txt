@@ -1,14 +1,18 @@
-=== تقرير المهمة 6 ===
+=== تقرير المهمة 6 (نسخة ابسط) ===
 
-Shape after cleaning: (768, 9)
+الفكرة:
+استخدمت نظام خبير بسيط + 4 نماذج تعلم آلي.
+ثم قارنت بينهم في accuracy و precision و recall و f1.
 
-Expert metrics:
-accuracy     0.649351
-precision    0.500000
-recall       0.722222
+حجم البيانات بعد التنظيف: (768, 9)
 
-ML metrics:
-                    accuracy  precision    recall
-LogisticRegression  0.707792   0.600000  0.500000
-DecisionTree        0.766234   0.645161  0.740741
-KNN                 0.753247   0.681818  0.555556
+النتائج:
+                    accuracy  precision    recall        f1
+ExpertSystem        0.668831   0.521739  0.666667  0.585366
+LogisticRegression  0.707792   0.600000  0.500000  0.545455
+DecisionTree        0.759740   0.639344  0.722222  0.678261
+RandomForest        0.740260   0.652174  0.555556  0.600000
+KNN                 0.740260   0.634615  0.611111  0.622642
+
+ملاحظة بسيطة:
+الهدف هنا شرح واضح ومباشر بدون تعقيد كبير في الضبط.

@@ -1,12 +1,12 @@
-=== تقرير المهمة 5 (نسخة ابسط) ===
+=== تقرير المهمة 5 و6 (نسخة بسيطة) ===
 
 الفكرة:
-تحليل مباشر للبيانات وتنظيف بسيط مع 3 رسومات.
+تحليل مبسط للبيانات + مقارنة نظام خبير مع نماذج تعلم آلي.
 
-حجم البيانات قبل التنظيف: (768, 9)
-حجم البيانات بعد التنظيف: (768, 9)
+Raw shape: (768, 9)
+Clean shape: (768, 9)
 
-أول 5 سجلات:
+First 5 rows:
  Pregnancies  Glucose  BloodPressure  SkinThickness  Insulin  BMI  DiabetesPedigreeFunction  Age  Outcome
            6      148             72             35        0 33.6                     0.627   50        1
            1       85             66             29        0 26.6                     0.351   31        0
@@ -14,7 +14,7 @@
            1       89             66             23       94 28.1                     0.167   21        0
            0      137             40             35      168 43.1                     2.288   33        1
 
-أنواع الأعمدة:
+Dataset info (dtypes):
 Pregnancies                   int64
 Glucose                       int64
 BloodPressure                 int64
@@ -25,7 +25,7 @@ DiabetesPedigreeFunction    float64
 Age                           int64
 Outcome                       int64
 
-القيم المفقودة قبل التنظيف:
+Missing values before cleaning:
 Pregnancies                 0
 Glucose                     0
 BloodPressure               0
@@ -36,7 +36,7 @@ DiabetesPedigreeFunction    0
 Age                         0
 Outcome                     0
 
-إحصاءات أساسية:
+Basic statistics:
        Pregnancies     Glucose  BloodPressure  SkinThickness     Insulin         BMI  DiabetesPedigreeFunction         Age     Outcome
 count   768.000000  768.000000     768.000000     768.000000  768.000000  768.000000                768.000000  768.000000  768.000000
 mean      3.845052  121.656250      72.386719      29.108073  140.671875   32.455208                  0.471876   33.240885    0.348958
@@ -47,16 +47,13 @@ min       0.000000   44.000000      24.000000       7.000000   14.000000   18.20
 75%       6.000000  140.250000      80.000000      32.000000  127.250000   36.600000                  0.626250   41.000000    1.000000
 max      17.000000  199.000000     122.000000      99.000000  846.000000   67.100000                  2.420000   81.000000    1.000000
 
-متوسط/انحراف العمر حسب الإصابة:
-              mean        std  count
-Outcome                             
-0        31.190000  11.667655    500
-1        37.067164  10.968254    268
+Age mean/std by outcome:
+                   mean        std  count
+Outcome                                  
+Non-Diabetic  31.190000  11.667655    500
+Diabetic      37.067164  10.968254    268
 
-ارتباط BloodPressure مع BMI: 0.2813
-ارتباط Glucose مع Insulin: 0.4195
-
-أعلى 10 معاملات ارتباط:
+Top 10 correlations (absolute sorted):
     Feature_1 Feature_2  Correlation  Abs_Correlation
   Pregnancies       Age     0.544341         0.544341
 SkinThickness       BMI     0.543205         0.543205
@@ -69,8 +66,21 @@ BloodPressure       BMI     0.281257         0.281257
           Age   Outcome     0.238356         0.238356
       Glucose       BMI     0.231049         0.231049
 
-إجابات الأسئلة المطلوبة:
+Filtered question answers:
 - avg_insulin_pregnant_over_35: 147.75
-- min_bmi_male_diabetic: غير متاح (لا يوجد Gender)
-- bp_range_female_non_diabetic: غير متاح (لا يوجد Gender)
-- bp_range_male_over_40: غير متاح (لا يوجد Gender)
+- min_bmi_male_diabetic: Unavailable (dataset has no Gender column)
+- bp_range_female_non_diabetic: Unavailable (dataset has no Gender column; dataset is female-only)
+- bp_range_male_over_40: Unavailable (dataset has no Gender column)
+
+نتائج النظام الخبير:
+accuracy     0.610390
+precision    0.465116
+recall       0.740741
+
+نتائج نماذج التعلم الآلي:
+                    accuracy  precision    recall
+LogisticRegression  0.707792   0.600000  0.500000
+DecisionTree        0.759740   0.639344  0.722222
+KNN                 0.740260   0.634615  0.611111
+
+ملاحظة: الهدف هنا البساطة والوضوح في الحل.

@@ -1,6 +1,5 @@
 import json
 from pathlib import Path
-from typing import Dict, List, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -20,21 +19,18 @@ REPORT_PATH = OUTPUT_DIR / "report_task5_6.txt"
 METRICS_PATH = OUTPUT_DIR / "metrics_task6.json"
 
 
-def ensure_dirs() -> None:
+def ensure_dirs():
     OUTPUT_DIR.mkdir(exist_ok=True)
     FIG_DIR.mkdir(exist_ok=True)
 
 
-def load_data() -> pd.DataFrame:
-    """Load diabetes dataset from public URL."""
+def load_data():
+    """تحميل البيانات."""
     return pd.read_csv(DATA_URL)
 
 
-def detect_and_handle_missing_values(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[str, int]]:
-    """
-    In this dataset, zeros in clinical columns are medically implausible and treated as missing.
-    We replace them with median values (robust to skew/outliers).
-    """
+def detect_and_handle_missing_values(df):
+    """تعويض القيم غير المنطقية بشكل بسيط."""
     df_clean = df.copy()
 
     zero_as_missing_cols = [
@@ -57,26 +53,13 @@ def detect_and_handle_missing_values(df: pd.DataFrame) -> Tuple[pd.DataFrame, Di
     return df_clean, missing_before
 
 
-def cap_outliers_iqr(df: pd.DataFrame, columns: List[str]) -> pd.DataFrame:
-    """Cap outliers using IQR rule (winsorization)."""
-    result = df.copy()
-    for col in columns:
-        q1 = result[col].quantile(0.25)
-        q3 = result[col].quantile(0.75)
-        iqr = q3 - q1
-        lower = q1 - 1.5 * iqr
-        upper = q3 + 1.5 * iqr
-        result[col] = result[col].clip(lower=lower, upper=upper)
-    return result
-
-
-def summary_statistics_by_outcome(df: pd.DataFrame) -> pd.DataFrame:
+def summary_statistics_by_outcome(df):
     return df.groupby("Outcome")["Age"].agg(["mean", "std", "count"]).rename(
         index={0: "Non-Diabetic", 1: "Diabetic"}
     )
 
 
-def pairwise_correlations_sorted(df: pd.DataFrame) -> pd.DataFrame:
+def pairwise_correlations_sorted(df):
     corr = df.corr(numeric_only=True)
     pairs = []
     cols = corr.columns.tolist()
@@ -90,7 +73,7 @@ def pairwise_correlations_sorted(df: pd.DataFrame) -> pd.DataFrame:
     return result
 
 
-def answer_filtered_questions(df: pd.DataFrame) -> Dict[str, str]:
+def answer_filtered_questions(df):
     answers = {}
 
     q1_data = df[(df["Pregnancies"] > 0) & (df["Age"] > 35)]
@@ -98,7 +81,6 @@ def answer_filtered_questions(df: pd.DataFrame) -> Dict[str, str]:
         f"{q1_data['Insulin'].mean():.2f}" if not q1_data.empty else "No data"
     )
 
-    # The classic Pima dataset has no gender column and includes only female records.
     if "Gender" in df.columns:
         male_diabetic = df[(df["Gender"].str.lower().isin(["male", "m", "man"])) & (df["Outcome"] == 1)]
         answers["min_bmi_male_diabetic"] = (
@@ -134,8 +116,8 @@ def answer_filtered_questions(df: pd.DataFrame) -> Dict[str, str]:
     return answers
 
 
-def plot_task5_figures(df: pd.DataFrame) -> None:
-    # 1) Boxplot: Age vs Outcome
+def plot_task5_figures(df):
+    # 1) Boxplot
     plt.figure(figsize=(7, 5))
     df.boxplot(column="Age", by="Outcome")
     plt.title("Age Distribution by Diabetes Outcome")
@@ -146,7 +128,7 @@ def plot_task5_figures(df: pd.DataFrame) -> None:
     plt.savefig(FIG_DIR / "boxplot_age_outcome.png", dpi=200)
     plt.close()
 
-    # 2) Barchart: Diabetes rate by BMI category
+    # 2) Barchart
     bins = [0, 18.5, 25, 30, 100]
     labels = ["Underweight", "Normal", "Overweight", "Obese"]
     df_bmi = df.copy()
@@ -161,9 +143,9 @@ def plot_task5_figures(df: pd.DataFrame) -> None:
     plt.savefig(FIG_DIR / "barchart_bmi_vs_diabetes_rate.png", dpi=200)
     plt.close()
 
-    # 3) Line-like trend: BMI vs Glucose by sorted BMI + rolling mean
+    # 3) Line
     trend = df[["BMI", "Glucose"]].sort_values("BMI").reset_index(drop=True)
-    trend["Glucose_Rolling"] = trend["Glucose"].rolling(window=25, min_periods=5).mean()
+    trend["Glucose_Rolling"] = trend["Glucose"].rolling(window=20, min_periods=5).mean()
     plt.figure(figsize=(8, 5))
     plt.plot(trend["BMI"], trend["Glucose_Rolling"])
     plt.title("Trend Between BMI and Glucose (Rolling Mean)")
@@ -174,13 +156,13 @@ def plot_task5_figures(df: pd.DataFrame) -> None:
     plt.close()
 
 
-def split_xy(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Series]:
+def split_xy(df):
     x = df.drop(columns=["Outcome"])
     y = df["Outcome"]
     return x, y
 
 
-def evaluate_predictions(y_true: pd.Series, y_pred: np.ndarray) -> Dict[str, float]:
+def evaluate_predictions(y_true, y_pred):
     return {
         "accuracy": float(accuracy_score(y_true, y_pred)),
         "precision": float(precision_score(y_true, y_pred, zero_division=0)),
@@ -188,11 +170,8 @@ def evaluate_predictions(y_true: pd.Series, y_pred: np.ndarray) -> Dict[str, flo
     }
 
 
-def expert_system_predict(x: pd.DataFrame) -> np.ndarray:
-    """
-    Simple rule base derived from domain-like thresholds.
-    A record is predicted diabetic if at least 2 rules are true.
-    """
+def expert_system_predict(x):
+    """نظام خبير بسيط."""
     rule1 = x["Glucose"] >= 125
     rule2 = x["BMI"] >= 30
     rule3 = x["Age"] >= 45
@@ -203,9 +182,7 @@ def expert_system_predict(x: pd.DataFrame) -> np.ndarray:
     return (score >= 2).astype(int).values
 
 
-def train_ml_models(
-    x_train: pd.DataFrame, y_train: pd.Series, x_test: pd.DataFrame, y_test: pd.Series
-) -> Dict[str, Dict[str, float]]:
+def train_ml_models(x_train, y_train, x_test, y_test):
     scaler = StandardScaler()
     x_train_scaled = scaler.fit_transform(x_train)
     x_test_scaled = scaler.transform(x_test)
@@ -229,7 +206,7 @@ def train_ml_models(
     return metrics
 
 
-def plot_task6_comparison(metrics: Dict[str, Dict[str, float]]) -> None:
+def plot_task6_comparison(metrics):
     df_metrics = pd.DataFrame(metrics).T
     plt.figure(figsize=(9, 5))
     df_metrics.plot(kind="bar")
@@ -243,20 +220,21 @@ def plot_task6_comparison(metrics: Dict[str, Dict[str, float]]) -> None:
 
 
 def save_report(
-    raw_df: pd.DataFrame,
-    clean_df: pd.DataFrame,
-    missing_before: Dict[str, int],
-    age_stats: pd.DataFrame,
-    corr_pairs: pd.DataFrame,
-    filtered_answers: Dict[str, str],
-    expert_metrics: Dict[str, float],
-    ml_metrics: Dict[str, Dict[str, float]],
-) -> None:
+    raw_df,
+    clean_df,
+    missing_before,
+    age_stats,
+    corr_pairs,
+    filtered_answers,
+    expert_metrics,
+    ml_metrics,
+):
     with REPORT_PATH.open("w", encoding="utf-8") as f:
-        f.write("=== Task 5 & 6 Diabetes Analysis Report ===\n\n")
-        f.write("Part 1 - Data Loading & Exploration\n")
-        f.write(f"- Raw shape: {raw_df.shape}\n")
-        f.write(f"- Clean shape: {clean_df.shape}\n\n")
+        f.write("=== تقرير المهمة 5 و6 (نسخة بسيطة) ===\n\n")
+        f.write("الفكرة:\n")
+        f.write("تحليل مبسط للبيانات + مقارنة نظام خبير مع نماذج تعلم آلي.\n\n")
+        f.write(f"Raw shape: {raw_df.shape}\n")
+        f.write(f"Clean shape: {clean_df.shape}\n\n")
 
         f.write("First 5 rows:\n")
         f.write(raw_df.head().to_string(index=False))
@@ -287,39 +265,21 @@ def save_report(
             f.write(f"- {key}: {value}\n")
         f.write("\n")
 
-        f.write("Part 2 - Expert System\n")
+        f.write("نتائج النظام الخبير:\n")
         f.write(pd.Series(expert_metrics).to_string())
         f.write("\n\n")
 
-        f.write("Part 3 - Machine Learning Models\n")
+        f.write("نتائج نماذج التعلم الآلي:\n")
         f.write(pd.DataFrame(ml_metrics).T.to_string())
         f.write("\n\n")
-
-        f.write("Justification for cleaning:\n")
-        f.write(
-            "- Zeros in clinical variables are treated as missing because they are often invalid measurements.\n"
-        )
-        f.write("- Median imputation is robust for skewed medical variables.\n")
-        f.write("- IQR capping reduces effect of extreme outliers without deleting records.\n")
+        f.write("ملاحظة: الهدف هنا البساطة والوضوح في الحل.\n")
 
 
-def main() -> None:
+def main():
     ensure_dirs()
     raw_df = load_data()
 
     clean_df, missing_before = detect_and_handle_missing_values(raw_df)
-    outlier_cols = [
-        "Pregnancies",
-        "Glucose",
-        "BloodPressure",
-        "SkinThickness",
-        "Insulin",
-        "BMI",
-        "DiabetesPedigreeFunction",
-        "Age",
-    ]
-    clean_df = cap_outliers_iqr(clean_df, outlier_cols)
-
     age_stats = summary_statistics_by_outcome(clean_df)
     corr_pairs = pairwise_correlations_sorted(clean_df)
     filtered_answers = answer_filtered_questions(clean_df)
@@ -338,21 +298,12 @@ def main() -> None:
     all_metrics = {"ExpertSystem": expert_metrics, **ml_metrics}
     plot_task6_comparison(all_metrics)
 
-    save_report(
-        raw_df=raw_df,
-        clean_df=clean_df,
-        missing_before=missing_before,
-        age_stats=age_stats,
-        corr_pairs=corr_pairs,
-        filtered_answers=filtered_answers,
-        expert_metrics=expert_metrics,
-        ml_metrics=ml_metrics,
-    )
+    save_report(raw_df, clean_df, missing_before, age_stats, corr_pairs, filtered_answers, expert_metrics, ml_metrics)
 
     with METRICS_PATH.open("w", encoding="utf-8") as f:
         json.dump(all_metrics, f, indent=2)
 
-    print("Done. Outputs generated in ./outputs")
+    print("تم تحديث الملفات بشكل مبسط.")
     print(f"- Report: {REPORT_PATH}")
     print(f"- Metrics JSON: {METRICS_PATH}")
     print(f"- Figures folder: {FIG_DIR}")
